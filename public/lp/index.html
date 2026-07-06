@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>jp-qac — 日本の住所・法人名入力を3行で。ずっと無料のオートコンプリートAPI</title>
+<meta name="description" content="郵便番号から住所自動入力、法人名オートコンプリート。APIもSDKも無料・商用利用可。必要なときだけ有償サポート。">
+<link rel="stylesheet" href="../sdk/jp-qac.css">
+<style>
+  :root {
+    --accent: #d6402a;
+    --accent-dark: #b23120;
+    --ink: #172033;
+    --muted: #5b6472;
+    --line: #e3e8f0;
+    --paper: #ffffff;
+    --wash: #f7f8fb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.7;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+  /* ヘッダー */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav { display: flex; align-items: center; gap: 28px; height: 60px; }
+  .logo { font-weight: 800; font-size: 20px; text-decoration: none; color: var(--ink); }
+  .logo .mark { color: var(--accent); }
+  .nav-links { display: flex; gap: 20px; margin-left: auto; }
+  .nav-links a { text-decoration: none; color: var(--muted); font-size: 14px; }
+  .nav-links a:hover { color: var(--ink); }
+
+  /* ヒーロー */
+  .hero { padding: 72px 0 56px; background: linear-gradient(180deg, var(--wash), var(--paper)); }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+  .badge {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    background: #fdeae6; color: var(--accent-dark); font-size: 13px; font-weight: 700;
+  }
+  h1 { font-size: clamp(30px, 4.5vw, 44px); line-height: 1.35; margin: 16px 0; letter-spacing: .01em; }
+  .lead { color: var(--muted); font-size: 17px; margin: 0 0 28px; }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 13px 26px; border-radius: 10px;
+    font-weight: 700; text-decoration: none; font-size: 15px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-ghost { border: 1.5px solid var(--line); color: var(--ink); background: #fff; }
+  .btn-ghost:hover { border-color: var(--ink); }
+  .hero-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
+
+  pre.code {
+    margin: 0; padding: 20px; border-radius: 14px; overflow-x: auto;
+    background: #1c2333; color: #dbe4f5; font-size: 13.5px; line-height: 1.7;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .code .c { color: #7d8aa5; } .code .s { color: #9ece6a; } .code .k { color: #ff9e64; }
+
+  /* セクション共通 */
+  section { padding: 72px 0; }
+  section.alt { background: var(--wash); }
+  .kicker { color: var(--accent); font-weight: 700; font-size: 14px; letter-spacing: .08em; }
+  h2 { font-size: clamp(24px, 3vw, 32px); margin: 8px 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 40px; }
+
+  /* デモ */
+  .demo-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 18px;
+    padding: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 36px;
+    box-shadow: 0 10px 30px rgba(23,32,51,.06);
+  }
+  .demo-card h3 { margin: 0 0 4px; font-size: 17px; }
+  .demo-card p { margin: 0 0 16px; font-size: 13.5px; color: var(--muted); }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+  .field input {
+    width: 100%; padding: 11px 12px; font: inherit; font-size: 15px;
+    border: 1.5px solid var(--line); border-radius: 10px; background: #fff;
+  }
+  .field input:focus { outline: none; border-color: var(--accent); }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .field { flex: 1; }
+
+  /* 特徴 */
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feature {
+    background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 24px;
+  }
+  .feature .icon { font-size: 26px; }
+  .feature h3 { font-size: 16px; margin: 10px 0 6px; }
+  .feature p { font-size: 14px; color: var(--muted); margin: 0; }
+
+  /* 料金 */
+  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+  .plan {
+    background: #fff; border: 1.5px solid var(--line); border-radius: 18px;
+    padding: 30px 26px; display: flex; flex-direction: column;
+  }
+  .plan.featured { border-color: var(--accent); box-shadow: 0 12px 32px rgba(214,64,42,.12); position: relative; }
+  .plan .tag {
+    position: absolute; top: -13px; left: 24px; background: var(--accent); color: #fff;
+    font-size: 12px; font-weight: 700; padding: 3px 12px; border-radius: 999px;
+  }
+  .plan h3 { margin: 0; font-size: 18px; }
+  .price { font-size: 34px; font-weight: 800; margin: 14px 0 2px; }
+  .price small { font-size: 14px; font-weight: 400; color: var(--muted); }
+  .plan .for { font-size: 13px; color: var(--muted); margin: 0 0 18px; }
+  .plan ul { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }
+  .plan li { padding: 7px 0 7px 26px; font-size: 14px; position: relative; border-top: 1px dashed var(--line); }
+  .plan li::before { content: "✓"; position: absolute; left: 2px; color: var(--accent); font-weight: 700; }
+  .plan .btn { text-align: center; }
+  .pricing-note { text-align: center; margin-top: 28px; font-size: 13.5px; color: var(--muted); }
+
+  /* FAQ */
+  .faq details {
+    background: #fff; border: 1px solid var(--line); border-radius: 12px;
+    padding: 4px 20px; margin-bottom: 12px;
+  }
+  .faq summary { font-weight: 700; padding: 12px 0; cursor: pointer; font-size: 15px; }
+  .faq p { margin: 0 0 16px; font-size: 14.5px; color: var(--muted); }
+
+  /* フッター */
+  footer { border-top: 1px solid var(--line); padding: 40px 0 48px; font-size: 13px; color: var(--muted); }
+  footer .logo { font-size: 16px; }
+  footer p { margin: 10px 0 0; }
+
+  @media (max-width: 800px) {
+    .hero-grid, .demo-card, .features, .plans { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#"><span class="mark">〒</span> jp-qac</a>
+    <nav class="nav-links">
+      <a href="#demo">デモ</a>
+      <a href="#features">特徴</a>
+      <a href="#pricing">料金</a>
+      <a href="#faq">FAQ</a>
+      <a href="/documentation">APIドキュメント</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="badge">API・SDK ずっと無料 / 商用利用OK</span>
+      <h1>日本の住所・法人名入力を、<br>3行のコードで速くする。</h1>
+      <p class="lead">
+        郵便番号を打てば住所が入る。社名を打てば法人番号まで入る。<br>
+        jp-qac は日本郵便・国税庁の公式データを使った、
+        セルフホスト型のオートコンプリート API + SDK です。
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#pricing">無料で始める</a>
+        <a class="btn btn-ghost" href="#demo">ライブデモを見る</a>
+      </div>
+      <p class="hero-note">クレジットカード不要・利用登録不要。困ったときだけサポート契約。</p>
+    </div>
+    <pre class="code"><span class="c">&lt;!-- これだけで動きます --&gt;</span>
+&lt;script src=<span class="s">"/demo/sdk/jp-qac.js"</span>&gt;&lt;/script&gt;
+&lt;link rel=<span class="s">"stylesheet"</span> href=<span class="s">"/demo/sdk/jp-qac.css"</span>&gt;
+
+&lt;script&gt;
+<span class="k">JpQac</span>.postal(<span class="s">"#zip"</span>, {
+  fill: { prefecture: <span class="s">"#pref"</span>,
+          city: <span class="s">"#city"</span>, town: <span class="s">"#town"</span> }
+});
+<span class="k">JpQac</span>.corporate(<span class="s">"#company"</span>, {
+  fill: { corporateNumber: <span class="s">"#houjin"</span> }
+});
+&lt;/script&gt;</pre>
+  </div>
+</section>
+
+<section id="demo" class="alt">
+  <div class="wrap">
+    <span class="kicker">LIVE DEMO</span>
+    <h2>今、このページで動いています</h2>
+    <p class="sub">このフォームは上のコードそのままです。郵便番号は全角・ハイフン付きでもOK。</p>
+    <div class="demo-card">
+      <div>
+        <h3>郵便番号 → 住所自動入力</h3>
+        <p>7桁そろった瞬間に住所が入ります（例: 100-0001）</p>
+        <div class="field">
+          <label for="zip">郵便番号</label>
+          <input id="zip" placeholder="100-0001" autocomplete="postal-code" inputmode="numeric">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="pref">都道府県</label>
+            <input id="pref">
+          </div>
+          <div class="field">
+            <label for="city">市区町村</label>
+            <input id="city">
+          </div>
+        </div>
+        <div class="field">
+          <label for="town">町域</label>
+          <input id="town">
+        </div>
+      </div>
+      <div>
+        <h3>法人名オートコンプリート</h3>
+        <p>2文字から候補を表示。選ぶと法人番号も入ります（例: トヨタ）</p>
+        <div class="field">
+          <label for="company">法人名</label>
+          <input id="company" placeholder="株式会社…" autocomplete="organization">
+        </div>
+        <div class="field">
+          <label for="houjin">法人番号</label>
+          <input id="houjin" readonly>
+        </div>
+        <div class="field">
+          <label for="corp-addr">所在地</label>
+          <input id="corp-addr" readonly>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <span class="kicker">FEATURES</span>
+    <h2>無料でも、手を抜いていません</h2>
+    <p class="sub">フォーム離脱率を下げる住所入力を、依存ゼロの軽量SDKで。</p>
+    <div class="features">
+      <div class="feature">
+        <div class="icon">🆓</div>
+        <h3>本体はずっと無料</h3>
+        <p>API・SDKともに無料で商用利用可。ライセンスキーも従量課金もありません。収益は有償サポートのみです。</p>
+      </div>
+      <div class="feature">
+        <div class="icon">⚡</div>
+        <h3>3行で導入完了</h3>
+        <p>scriptタグ1本、依存ライブラリゼロ、JS+CSS合計10KB未満。ビルド不要でどんなサイトにも足せます。</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🔐</div>
+        <h3>キーはサーバーに隠す設計</h3>
+        <p>国税庁Web-APIのアプリケーションIDはサーバー側のみで保持。ブラウザには一切露出しません。</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🏛️</div>
+        <h3>公式データソース</h3>
+        <p>住所は日本郵便、法人は国税庁法人番号公表サイト。自前クロールではなく一次データを使います。</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🈳</div>
+        <h3>日本語入力のクセに対応</h3>
+        <p>全角数字・ハイフン付き郵便番号（１００－０００１）もそのまま受理。正規化はSDKとAPIの両方で行います。</p>
+      </div>
+      <div class="feature">
+        <div class="icon">♿</div>
+        <h3>アクセシビリティ標準装備</h3>
+        <p>WAI-ARIA comboboxパターン準拠。矢印キー・Enter・Escapeの完全キーボード操作に対応しています。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" class="alt">
+  <div class="wrap">
+    <span class="kicker">PRICING</span>
+    <h2>ソフトウェアは無料。払うのはサポートだけ。</h2>
+    <p class="sub">どのプランでも機能制限はありません。違いは「困ったとき誰が助けるか」だけです。</p>
+    <div class="plans">
+      <div class="plan">
+        <h3>Free</h3>
+        <div class="price">¥0</div>
+        <p class="for">自分で解決できるチーム向け</p>
+        <ul>
+          <li>API・SDKの全機能</li>
+          <li>商用利用可</li>
+          <li>セルフホスト（台数無制限）</li>
+          <li>GitHub Issuesでのコミュニティサポート</li>
+          <li>ドキュメント・デモ環境</li>
+        </ul>
+        <a class="btn btn-ghost" href="#faq">今すぐ導入する</a>
+      </div>
+      <div class="plan featured">
+        <span class="tag">おすすめ</span>
+        <h3>スタンダードサポート</h3>
+        <div class="price">¥30,000<small> /月（税別）</small></div>
+        <p class="for">本番運用しているサービス向け</p>
+        <ul>
+          <li>Freeのすべて</li>
+          <li>メールサポート（2営業日以内に一次回答）</li>
+          <li>導入・アップグレード相談</li>
+          <li>データ更新・障害情報の事前通知</li>
+          <li>月1回までの設定レビュー</li>
+        </ul>
+        <a class="btn btn-primary" href="mailto:support@example.com?subject=jp-qac%20スタンダードサポート申込">申し込む</a>
+      </div>
+      <div class="plan">
+        <h3>エンタープライズ</h3>
+        <div class="price">応相談</div>
+        <p class="for">SLA・大規模トラフィックが必要な企業向け</p>
+        <ul>
+          <li>スタンダードのすべて</li>
+          <li>SLA（稼働率・応答時間の保証）</li>
+          <li>専用チャットでの優先対応</li>
+          <li>ホスティング・運用代行</li>
+          <li>カスタム開発・機能の優先実装</li>
+        </ul>
+        <a class="btn btn-ghost" href="mailto:support@example.com?subject=jp-qac%20エンタープライズ相談">相談する</a>
+      </div>
+    </div>
+    <p class="pricing-note">
+      単発の導入支援パック（環境構築＋フォーム組み込みまで伴走・¥100,000〜）もあります。お気軽にご相談ください。
+    </p>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <span class="kicker">FAQ</span>
+    <h2>よくある質問</h2>
+    <p class="sub"></p>
+    <div class="faq">
+      <details open>
+        <summary>本当に無料ですか？あとから課金されませんか？</summary>
+        <p>本体（API・SDK）は無料のまま提供し続けます。ライセンスキーや利用回数の制限はコードに存在しません。収益はサポート契約のみから得るモデルです。</p>
+      </details>
+      <details>
+        <summary>導入には何が必要ですか？</summary>
+        <p>Node.jsが動くサーバー1台です。<code>npm install → npm run data:postal → npm run dev</code> の3コマンドで起動します。法人検索を使う場合は国税庁Web-APIのアプリケーションID（無料で取得可）を .env に設定してください。</p>
+      </details>
+      <details>
+        <summary>データの鮮度はどう保たれますか？</summary>
+        <p>郵便番号データは <code>npm run data:postal</code> で日本郵便の公式データをアトミックに再取込します。法人データは国税庁Web-APIへのリアルタイム照会なので常に最新です。</p>
+      </details>
+      <details>
+        <summary>React / Vue と一緒に使えますか？</summary>
+        <p>使えます。SDKは値の書込後に input / change イベントを発火するため、各フレームワークのバインディングが追従します。SPAでのアンマウント用に destroy() も用意しています。</p>
+      </details>
+      <details>
+        <summary>サポート契約は途中でやめられますか？</summary>
+        <p>月単位でいつでも解約できます。解約後もソフトウェアはそのまま使い続けられます（無料なので）。</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a class="logo" href="#"><span class="mark">〒</span> jp-qac</a>
+    <p>郵便番号データ: 日本郵便株式会社の公開データを利用しています。</p>
+    <p>法人データ: このサービスは、国税庁法人番号システムWeb-API機能を利用して取得した情報をもとに作成していますが、サービスの内容は国税庁によって保証されたものではありません。</p>
+    <p>© 2026 jp-qac project</p>
+  </div>
+</footer>
+
+<script src="../sdk/jp-qac.js"></script>
+<script>
+  JpQac.postal("#zip", {
+    fill: { prefecture: "#pref", city: "#city", town: "#town" }
+  });
+  JpQac.corporate("#company", {
+    fill: { corporateNumber: "#houjin" },
+    onSelect: function (corp) {
+      document.querySelector("#corp-addr").value =
+        [corp.prefecture, corp.city, corp.street].filter(Boolean).join("");
+    }
+  });
+</script>
+</body>
+</html>

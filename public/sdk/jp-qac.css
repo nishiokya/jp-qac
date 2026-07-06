@@ -1,0 +1,100 @@
+/*!
+ * jp-qac SDK styles v0.1.0
+ * すべて CSS カスタムプロパティで上書き可能。
+ * 例: :root { --jpqac-accent: #0b5fff; }
+ */
+:root {
+  --jpqac-font: inherit;
+  --jpqac-bg: #ffffff;
+  --jpqac-fg: #172033;
+  --jpqac-muted: #6b7280;
+  --jpqac-border: #d5dbe7;
+  --jpqac-accent: #d6402a;
+  --jpqac-accent-fg: #ffffff;
+  --jpqac-radius: 10px;
+  --jpqac-shadow: 0 8px 24px rgba(23, 32, 51, 0.14);
+  --jpqac-z: 2147483000;
+}
+
+/* 候補リスト(コンボボックス) */
+.jpqac-listbox {
+  position: absolute;
+  box-sizing: border-box;
+  margin: 4px 0 0;
+  padding: 4px;
+  list-style: none;
+  font-family: var(--jpqac-font);
+  background: var(--jpqac-bg);
+  color: var(--jpqac-fg);
+  border: 1px solid var(--jpqac-border);
+  border-radius: var(--jpqac-radius);
+  box-shadow: var(--jpqac-shadow);
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: var(--jpqac-z);
+}
+
+.jpqac-option {
+  display: block;
+  padding: 8px 10px;
+  border-radius: calc(var(--jpqac-radius) - 4px);
+  cursor: pointer;
+  line-height: 1.45;
+}
+
+.jpqac-option[aria-selected="true"],
+.jpqac-option:hover {
+  background: var(--jpqac-accent);
+  color: var(--jpqac-accent-fg);
+}
+
+.jpqac-option[aria-selected="true"] .jpqac-option-sub,
+.jpqac-option:hover .jpqac-option-sub {
+  color: inherit;
+  opacity: 0.85;
+}
+
+.jpqac-option-name {
+  display: block;
+  font-weight: 600;
+}
+
+.jpqac-option-sub {
+  display: block;
+  font-size: 0.85em;
+  color: var(--jpqac-muted);
+}
+
+.jpqac-option-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  font-size: 0.75em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  vertical-align: 1px;
+}
+
+/* 状態メッセージ(検索中・該当なし) */
+.jpqac-status {
+  padding: 10px;
+  font-size: 0.9em;
+  color: var(--jpqac-muted);
+  cursor: default;
+}
+
+/* 通信中の入力欄に付与される */
+.jpqac-loading {
+  background-image: linear-gradient(90deg, transparent 0%, rgba(214, 64, 42, 0.12) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: jpqac-shimmer 1.1s linear infinite;
+}
+
+@keyframes jpqac-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jpqac-loading { animation: none; background-image: none; }
+}

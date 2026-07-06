@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>jp-qac API 動作確認</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:760px;margin:48px auto;padding:0 20px;color:#172033}
+    section{padding:24px;border:1px solid #dce2ec;border-radius:16px;margin:20px 0}
+    label{display:block;font-weight:700;margin-bottom:8px} input,button{font:inherit;padding:10px 12px}
+    input{width:min(380px,70%)} button{cursor:pointer} pre{white-space:pre-wrap;background:#f5f7fa;padding:16px;border-radius:10px}
+  </style>
+</head>
+<body>
+  <h1>jp-qac API 動作確認</h1>
+  <p>APIの応答をそのまま表示する、依存関係のない検証ページです。</p>
+  <section>
+    <form id="postal-form">
+      <label for="postal">郵便番号</label>
+      <input id="postal" value="100-0001" autocomplete="postal-code">
+      <button>検索</button>
+    </form>
+    <pre id="postal-result">未実行</pre>
+  </section>
+  <section>
+    <form id="corporation-form">
+      <label for="company">法人名</label>
+      <input id="company" value="株式会社100" autocomplete="organization">
+      <button>検索</button>
+    </form>
+    <pre id="corporation-result">未実行</pre>
+  </section>
+  <script>
+    async function show(url, output) {
+      output.textContent = "検索中…";
+      try {
+        const response = await fetch(url);
+        const body = await response.json();
+        output.textContent = `${response.status} ${response.statusText}\n\n${JSON.stringify(body, null, 2)}`;
+      } catch (error) { output.textContent = String(error); }
+    }
+    document.querySelector("#postal-form").addEventListener("submit", event => {
+      event.preventDefault();
+      show(`/v1/postal-codes/${encodeURIComponent(document.querySelector("#postal").value)}`,
+        document.querySelector("#postal-result"));
+    });
+    document.querySelector("#corporation-form").addEventListener("submit", event => {
+      event.preventDefault();
+      show(`/v1/corporations?name=${encodeURIComponent(document.querySelector("#company").value)}`,
+        document.querySelector("#corporation-result"));
+    });
+  </script>
+</body>
+</html>

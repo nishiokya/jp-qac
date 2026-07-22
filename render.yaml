@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: jp-qac
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm run data:postal && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATABASE_PATH
+        value: ./data/jp-qac.sqlite
+      - key: ALLOWED_ORIGINS
+        value: https://jp-qac.onrender.com
+      - key: RATE_LIMIT_MAX
+        value: 100

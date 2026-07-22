@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>jp-qac — 日本の住所・法人名入力を3行で。ずっと無料のオートコンプリートAPI</title>
-<meta name="description" content="郵便番号から住所自動入力、法人名オートコンプリート。APIもSDKも無料・商用利用可。必要なときだけ有償サポート。">
+<title>jp-qac — 日本の住所・法人名入力をかんたんに</title>
+<meta name="description" content="郵便番号からの住所入力と法人名検索を、登録なし・無料で試せるオープンソースのAPIとSDKです。">
 <link rel="stylesheet" href="../sdk/jp-qac.css">
 <style>
   :root {
@@ -101,26 +101,23 @@
   .feature h3 { font-size: 16px; margin: 10px 0 6px; }
   .feature p { font-size: 14px; color: var(--muted); margin: 0; }
 
-  /* 料金 */
-  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
-  .plan {
-    background: #fff; border: 1.5px solid var(--line); border-radius: 18px;
-    padding: 30px 26px; display: flex; flex-direction: column;
+  /* はじめ方・サポート */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .step { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+  .step-number {
+    display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+    background: #fdeae6; color: var(--accent-dark); font-weight: 800; font-size: 14px;
   }
-  .plan.featured { border-color: var(--accent); box-shadow: 0 12px 32px rgba(214,64,42,.12); position: relative; }
-  .plan .tag {
-    position: absolute; top: -13px; left: 24px; background: var(--accent); color: #fff;
-    font-size: 12px; font-weight: 700; padding: 3px 12px; border-radius: 999px;
+  .step h3 { margin: 12px 0 6px; font-size: 17px; }
+  .step p { margin: 0; color: var(--muted); font-size: 14px; }
+  .start-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+  .support-card {
+    display: grid; grid-template-columns: 1.35fr .65fr; gap: 32px; align-items: center;
+    background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 32px;
   }
-  .plan h3 { margin: 0; font-size: 18px; }
-  .price { font-size: 34px; font-weight: 800; margin: 14px 0 2px; }
-  .price small { font-size: 14px; font-weight: 400; color: var(--muted); }
-  .plan .for { font-size: 13px; color: var(--muted); margin: 0 0 18px; }
-  .plan ul { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }
-  .plan li { padding: 7px 0 7px 26px; font-size: 14px; position: relative; border-top: 1px dashed var(--line); }
-  .plan li::before { content: "✓"; position: absolute; left: 2px; color: var(--accent); font-weight: 700; }
-  .plan .btn { text-align: center; }
-  .pricing-note { text-align: center; margin-top: 28px; font-size: 13.5px; color: var(--muted); }
+  .support-card h3 { margin: 0 0 8px; }
+  .support-card p { color: var(--muted); margin: 0; }
+  .support-card .btn { text-align: center; }
 
   /* FAQ */
   .faq details {
@@ -136,7 +133,7 @@
   footer p { margin: 10px 0 0; }
 
   @media (max-width: 800px) {
-    .hero-grid, .demo-card, .features, .plans { grid-template-columns: 1fr; }
+    .hero-grid, .demo-card, .features, .steps, .support-card { grid-template-columns: 1fr; }
     .nav-links { display: none; }
   }
 </style>
@@ -148,10 +145,11 @@
     <a class="logo" href="#"><span class="mark">〒</span> jp-qac</a>
     <nav class="nav-links">
       <a href="#demo">デモ</a>
+      <a href="#start">はじめ方</a>
       <a href="#features">特徴</a>
-      <a href="#pricing">料金</a>
+      <a href="#support">サポート</a>
       <a href="#faq">FAQ</a>
-      <a href="/documentation">APIドキュメント</a>
+      <a href="../tutorial/">チュートリアル</a>
     </nav>
   </div>
 </header>
@@ -159,18 +157,18 @@
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <span class="badge">API・SDK ずっと無料 / 商用利用OK</span>
-      <h1>日本の住所・法人名入力を、<br>3行のコードで速くする。</h1>
+      <span class="badge">登録なし・無料で使える</span>
+      <h1>日本の住所・法人名入力を、<br>もっとかんたんに。</h1>
       <p class="lead">
         郵便番号を打てば住所が入る。社名を打てば法人番号まで入る。<br>
-        jp-qac は日本郵便・国税庁の公式データを使った、
-        セルフホスト型のオートコンプリート API + SDK です。
+        jp-qac は、必要なものを自分のサーバーで動かせる
+        オープンソースのオートコンプリート API + SDK です。
       </p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="#pricing">無料で始める</a>
+        <a class="btn btn-primary" href="../tutorial/">5分で試してみる</a>
         <a class="btn btn-ghost" href="#demo">ライブデモを見る</a>
       </div>
-      <p class="hero-note">クレジットカード不要・利用登録不要。困ったときだけサポート契約。</p>
+      <p class="hero-note">クレジットカード・利用登録・ライセンスキーは不要です。</p>
     </div>
     <pre class="code"><span class="c">&lt;!-- これだけで動きます --&gt;</span>
 &lt;script src=<span class="s">"/demo/sdk/jp-qac.js"</span>&gt;&lt;/script&gt;
@@ -239,13 +237,13 @@
 <section id="features">
   <div class="wrap">
     <span class="kicker">FEATURES</span>
-    <h2>無料でも、手を抜いていません</h2>
-    <p class="sub">フォーム離脱率を下げる住所入力を、依存ゼロの軽量SDKで。</p>
+    <h2>小さく始めて、そのまま使えます</h2>
+    <p class="sub">日本語の入力で困りやすいところを、依存ゼロの軽量SDKにまとめました。</p>
     <div class="features">
       <div class="feature">
-        <div class="icon">🆓</div>
-        <h3>本体はずっと無料</h3>
-        <p>API・SDKともに無料で商用利用可。ライセンスキーも従量課金もありません。収益は有償サポートのみです。</p>
+        <div class="icon">🌱</div>
+        <h3>基本機能は無料</h3>
+        <p>API・SDKは無料で利用できます。ライセンスキーや利用回数による課金はありません。</p>
       </div>
       <div class="feature">
         <div class="icon">⚡</div>
@@ -276,56 +274,48 @@
   </div>
 </section>
 
-<section id="pricing" class="alt">
+<section id="start" class="alt">
   <div class="wrap">
-    <span class="kicker">PRICING</span>
-    <h2>ソフトウェアは無料。払うのはサポートだけ。</h2>
-    <p class="sub">どのプランでも機能制限はありません。違いは「困ったとき誰が助けるか」だけです。</p>
-    <div class="plans">
-      <div class="plan">
-        <h3>Free</h3>
-        <div class="price">¥0</div>
-        <p class="for">自分で解決できるチーム向け</p>
-        <ul>
-          <li>API・SDKの全機能</li>
-          <li>商用利用可</li>
-          <li>セルフホスト（台数無制限）</li>
-          <li>GitHub Issuesでのコミュニティサポート</li>
-          <li>ドキュメント・デモ環境</li>
-        </ul>
-        <a class="btn btn-ghost" href="#faq">今すぐ導入する</a>
+    <span class="kicker">GETTING STARTED</span>
+    <h2>はじめてでも、順番どおりで大丈夫</h2>
+    <p class="sub">まず試すだけなら5分ほど。アカウント作成はありません。</p>
+    <div class="steps">
+      <div class="step">
+        <span class="step-number">1</span>
+        <h3>動きを試す</h3>
+        <p>上のデモで郵便番号を入力し、住所が入ることを確認します。</p>
       </div>
-      <div class="plan featured">
-        <span class="tag">おすすめ</span>
-        <h3>スタンダードサポート</h3>
-        <div class="price">¥30,000<small> /月（税別）</small></div>
-        <p class="for">本番運用しているサービス向け</p>
-        <ul>
-          <li>Freeのすべて</li>
-          <li>メールサポート（2営業日以内に一次回答）</li>
-          <li>導入・アップグレード相談</li>
-          <li>データ更新・障害情報の事前通知</li>
-          <li>月1回までの設定レビュー</li>
-        </ul>
-        <a class="btn btn-primary" href="mailto:support@example.com?subject=jp-qac%20スタンダードサポート申込">申し込む</a>
+      <div class="step">
+        <span class="step-number">2</span>
+        <h3>手元で起動する</h3>
+        <p>Node.jsを用意し、チュートリアルのコマンドを順に実行します。</p>
       </div>
-      <div class="plan">
-        <h3>エンタープライズ</h3>
-        <div class="price">応相談</div>
-        <p class="for">SLA・大規模トラフィックが必要な企業向け</p>
-        <ul>
-          <li>スタンダードのすべて</li>
-          <li>SLA（稼働率・応答時間の保証）</li>
-          <li>専用チャットでの優先対応</li>
-          <li>ホスティング・運用代行</li>
-          <li>カスタム開発・機能の優先実装</li>
-        </ul>
-        <a class="btn btn-ghost" href="mailto:support@example.com?subject=jp-qac%20エンタープライズ相談">相談する</a>
+      <div class="step">
+        <span class="step-number">3</span>
+        <h3>フォームにつなぐ</h3>
+        <p>用意したHTMLにSDKを読み込み、入力欄のIDを指定すれば完了です。</p>
       </div>
     </div>
-    <p class="pricing-note">
-      単発の導入支援パック（環境構築＋フォーム組み込みまで伴走・¥100,000〜）もあります。お気軽にご相談ください。
-    </p>
+    <div class="start-actions">
+      <a class="btn btn-primary" href="../tutorial/">チュートリアルを開く</a>
+      <a class="btn btn-ghost" href="https://github.com/nishiokya/jp-qac">GitHubでコードを見る</a>
+      <a class="btn btn-ghost" href="/documentation">API仕様を見る</a>
+    </div>
+  </div>
+</section>
+
+<section id="support">
+  <div class="wrap">
+    <span class="kicker">SUPPORT</span>
+    <h2>困ったときの選択肢</h2>
+    <p class="sub">まずは無料のチュートリアルとドキュメントをご利用ください。</p>
+    <div class="support-card">
+      <div>
+        <h3>個別に伴走が必要な場合だけ、有料サポート</h3>
+        <p>環境構築、既存フォームへの組み込み、運用相談などを個別にお手伝いします。サポートを利用しなくても、API・SDKの機能は変わりません。</p>
+      </div>
+      <a class="btn btn-ghost" href="https://github.com/nishiokya/jp-qac/issues">GitHub Issuesを見る</a>
+    </div>
   </div>
 </section>
 
@@ -336,12 +326,12 @@
     <p class="sub"></p>
     <div class="faq">
       <details open>
-        <summary>本当に無料ですか？あとから課金されませんか？</summary>
-        <p>本体（API・SDK）は無料のまま提供し続けます。ライセンスキーや利用回数の制限はコードに存在しません。収益はサポート契約のみから得るモデルです。</p>
+        <summary>どこまで無料で使えますか？</summary>
+        <p>API・SDKの基本機能を無料で利用できます。ライセンスキーや利用回数による課金はありません。個別の導入支援や運用相談を希望する場合のみ、有料サポートをご案内します。</p>
       </details>
       <details>
         <summary>導入には何が必要ですか？</summary>
-        <p>Node.jsが動くサーバー1台です。<code>npm install → npm run data:postal → npm run dev</code> の3コマンドで起動します。法人検索を使う場合は国税庁Web-APIのアプリケーションID（無料で取得可）を .env に設定してください。</p>
+        <p>Node.jsが動く環境があれば始められます。詳しい手順は<a href="../tutorial/">チュートリアル</a>に、コピーして使えるコマンドとHTML例を掲載しています。</p>
       </details>
       <details>
         <summary>データの鮮度はどう保たれますか？</summary>
@@ -352,8 +342,8 @@
         <p>使えます。SDKは値の書込後に input / change イベントを発火するため、各フレームワークのバインディングが追従します。SPAでのアンマウント用に destroy() も用意しています。</p>
       </details>
       <details>
-        <summary>サポート契約は途中でやめられますか？</summary>
-        <p>月単位でいつでも解約できます。解約後もソフトウェアはそのまま使い続けられます（無料なので）。</p>
+        <summary>有料サポートを使わないと機能が制限されますか？</summary>
+        <p>制限されません。サポートは環境構築や組み込みを一緒に進めたい方向けの任意サービスです。</p>
       </details>
     </div>
   </div>
@@ -364,6 +354,7 @@
     <a class="logo" href="#"><span class="mark">〒</span> jp-qac</a>
     <p>郵便番号データ: 日本郵便株式会社の公開データを利用しています。</p>
     <p>法人データ: このサービスは、国税庁法人番号システムWeb-API機能を利用して取得した情報をもとに作成していますが、サービスの内容は国税庁によって保証されたものではありません。</p>
+    <p><a href="../tutorial/">チュートリアル</a> · <a href="https://github.com/nishiokya/jp-qac">GitHub</a> · <a href="/documentation">APIドキュメント</a></p>
     <p>© 2026 jp-qac project</p>
   </div>
 </footer>

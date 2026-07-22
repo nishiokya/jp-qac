@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>はじめての jp-qac — 5分チュートリアル</title>
+<meta name="description" content="jp-qacを手元で起動し、郵便番号から住所を自動入力するまでの初心者向けチュートリアルです。">
+<style>
+  :root { --accent:#d6402a; --accent-dark:#b23120; --ink:#172033; --muted:#5b6472; --line:#e3e8f0; --wash:#f7f8fb; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin:0; color:var(--ink); background:#fff; font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif; line-height:1.75; }
+  a { color:var(--accent-dark); }
+  header { position:sticky; top:0; z-index:10; background:rgba(255,255,255,.94); border-bottom:1px solid var(--line); backdrop-filter:blur(8px); }
+  .nav { max-width:980px; height:60px; margin:auto; padding:0 24px; display:flex; align-items:center; gap:20px; }
+  .logo { color:var(--ink); font-weight:800; text-decoration:none; }
+  .logo span { color:var(--accent); }
+  .nav-links { margin-left:auto; display:flex; gap:18px; font-size:14px; }
+  .nav-links a { color:var(--muted); text-decoration:none; }
+  .hero { background:linear-gradient(180deg,var(--wash),#fff); padding:64px 24px 48px; }
+  .hero-inner, main { max-width:860px; margin:auto; }
+  .eyebrow { color:var(--accent-dark); font-size:14px; font-weight:800; letter-spacing:.06em; }
+  h1 { margin:8px 0 14px; font-size:clamp(30px,5vw,44px); line-height:1.3; }
+  .lead { max-width:680px; color:var(--muted); font-size:17px; }
+  .facts { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+  .fact { padding:6px 12px; border:1px solid var(--line); border-radius:999px; background:#fff; font-size:13px; }
+  main { padding:20px 24px 80px; }
+  .toc { margin:24px 0 48px; padding:22px 24px; border:1px solid var(--line); border-radius:14px; background:var(--wash); }
+  .toc strong { display:block; margin-bottom:8px; }
+  .toc ol { margin:0; padding-left:22px; columns:2; }
+  .toc li { margin:4px 0; }
+  section { padding:38px 0; border-top:1px solid var(--line); }
+  section:first-of-type { border-top:0; }
+  .step-label { display:inline-grid; place-items:center; min-width:32px; height:32px; padding:0 10px; border-radius:999px; background:#fdeae6; color:var(--accent-dark); font-weight:800; font-size:13px; }
+  h2 { margin:10px 0 10px; font-size:clamp(23px,3vw,30px); }
+  h3 { margin:28px 0 8px; font-size:18px; }
+  p { margin:8px 0 16px; }
+  .note { margin:18px 0; padding:16px 18px; border-left:4px solid var(--accent); background:#fff7f5; border-radius:0 10px 10px 0; }
+  .check { margin:18px 0; padding:16px 20px; background:#f3f8f4; border:1px solid #cfe2d3; border-radius:12px; }
+  .check::before { content:"確認ポイント"; display:block; color:#296337; font-weight:800; font-size:13px; margin-bottom:4px; }
+  .code-wrap { position:relative; margin:14px 0 22px; }
+  pre { margin:0; padding:20px; overflow:auto; border-radius:12px; background:#1c2333; color:#dbe4f5; font:13.5px/1.7 ui-monospace,"SF Mono",Menlo,monospace; }
+  code { font-family:ui-monospace,"SF Mono",Menlo,monospace; }
+  :not(pre)>code { padding:2px 5px; border-radius:5px; background:#f0f2f6; font-size:.92em; }
+  .copy { position:absolute; top:10px; right:10px; border:1px solid #667085; border-radius:7px; padding:5px 9px; background:#2b3549; color:#fff; cursor:pointer; font:12px system-ui,sans-serif; }
+  .result { padding:14px 16px; border:1px solid var(--line); border-radius:10px; background:var(--wash); font-size:14px; }
+  .next { margin-top:36px; padding:28px; border-radius:16px; background:var(--ink); color:#fff; }
+  .next h2 { margin-top:0; }
+  .next a { color:#ffd3ca; }
+  footer { border-top:1px solid var(--line); padding:32px 24px; color:var(--muted); text-align:center; font-size:13px; }
+  @media (max-width:640px) { .nav-links { display:none; } .toc ol { columns:1; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <a class="logo" href="../lp/"><span>〒</span> jp-qac</a>
+    <nav class="nav-links">
+      <a href="#setup">起動</a>
+      <a href="#api">API</a>
+      <a href="#sdk">フォーム組み込み</a>
+      <a href="#trouble">困ったとき</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">BEGINNER TUTORIAL</span>
+    <h1>はじめての jp-qac</h1>
+    <p class="lead">手元でサーバーを起動し、郵便番号から住所を自動入力するフォームを作ります。上から順にコピーして進めれば大丈夫です。</p>
+    <div class="facts">
+      <span class="fact">所要時間 約5〜10分</span>
+      <span class="fact">登録不要</span>
+      <span class="fact">Node.js 20以上</span>
+      <span class="fact">法人検索は後から追加可能</span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <nav class="toc" aria-label="目次">
+    <strong>このチュートリアルでやること</strong>
+    <ol>
+      <li><a href="#prepare">準備する</a></li>
+      <li><a href="#setup">jp-qacを起動する</a></li>
+      <li><a href="#api">APIを試す</a></li>
+      <li><a href="#sdk">フォームに組み込む</a></li>
+      <li><a href="#corporate">法人検索を有効にする</a></li>
+      <li><a href="#production">公開前に確認する</a></li>
+    </ol>
+  </nav>
+
+  <section id="prepare">
+    <span class="step-label">STEP 1</span>
+    <h2>準備する</h2>
+    <p>Node.js 20以上とGitが必要です。ターミナルで次の2つを実行して、バージョンが表示されることを確認します。</p>
+    <div class="code-wrap"><button class="copy" type="button">コピー</button><pre><code>node --version
+git --version</code></pre></div>
+    <div class="check"><code>v20</code> 以上のNode.jsと、Gitのバージョン番号が表示されれば準備完了です。</div>
+  </section>
+
+  <section id="setup">
+    <span class="step-label">STEP 2</span>
+    <h2>jp-qacを起動する</h2>
+    <p>コードを取得し、必要なパッケージと郵便番号データを用意します。</p>
+    <div class="code-wrap"><button class="copy" type="button">コピー</button><pre><code>git clone https://github.com/nishiokya/jp-qac.git
+cd jp-qac
+npm install
+cp .env.example .env
+npm run data:postal
+npm run dev</code></pre></div>
+    <p>最後のコマンドは起動したままにします。ブラウザで次のURLを開いてください。</p>
+    <p class="result"><a href="http://127.0.0.1:3010/demo/lp/">http://127.0.0.1:3010/demo/lp/</a></p>
+    <div class="check">jp-qacのページが表示され、郵便番号欄に <code>100-0001</code> を入れて住所が表示されれば成功です。</div>
+  </section>
+
+  <section id="api">
+    <span class="step-label">STEP 3</span>
+    <h2>APIを試す</h2>
+    <p>別のターミナルを開き、郵便番号APIを直接呼び出します。ハイフン付き・なし、全角数字のどれでも利用できます。</p>
+    <div class="code-wrap"><button class="copy" type="button">コピー</button><pre><code>curl http://127.0.0.1:3010/v1/postal-codes/100-0001</code></pre></div>
+    <p>レスポンスの <code>data</code> に都道府県、市区町村、町域が入ります。ブラウザでAPI仕様を確認したい場合は <a href="http://127.0.0.1:3010/documentation">APIドキュメント</a>を開きます。</p>
+    <div class="note"><strong>うまくいかない場合:</strong> <code>npm run dev</code> を実行したターミナルが起動中か、URLのポートが <code>3010</code> かを確認してください。</div>
+  </section>
+
+  <section id="sdk">
+    <span class="step-label">STEP 4</span>
+    <h2>自分のフォームに組み込む</h2>
+    <p>次の内容を <code>example.html</code> として保存します。入力欄のIDと <code>fill</code> の指定が対応しているのがポイントです。</p>
+    <div class="code-wrap"><button class="copy" type="button">コピー</button><pre><code>&lt;!doctype html&gt;
+&lt;html lang="ja"&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;住所入力サンプル&lt;/title&gt;
+&lt;link rel="stylesheet" href="http://127.0.0.1:3010/demo/sdk/jp-qac.css"&gt;
+
+&lt;label&gt;郵便番号 &lt;input id="zip" placeholder="100-0001"&gt;&lt;/label&gt;
+&lt;label&gt;都道府県 &lt;input id="prefecture"&gt;&lt;/label&gt;
+&lt;label&gt;市区町村 &lt;input id="city"&gt;&lt;/label&gt;
+&lt;label&gt;町域 &lt;input id="town"&gt;&lt;/label&gt;
+
+&lt;script src="http://127.0.0.1:3010/demo/sdk/jp-qac.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  JpQac.configure({ baseUrl: "http://127.0.0.1:3010" });
+  JpQac.postal("#zip", {
+    fill: {
+      prefecture: "#prefecture",
+      city: "#city",
+      town: "#town"
+    }
+  });
+&lt;/script&gt;
+&lt;/html&gt;</code></pre></div>
+    <p><code>example.html</code> をブラウザで開き、<code>100-0001</code> を入力します。</p>
+    <div class="check">都道府県・市区町村・町域が自動入力されれば、最初の組み込みは完了です。</div>
+    <div class="note"><strong>CORSエラーが出た場合:</strong> 実際のサイトから利用するときは、そのサイトのオリジンを <code>.env</code> の <code>ALLOWED_ORIGINS</code> に追加してjp-qacを再起動します。</div>
+  </section>
+
+  <section id="corporate">
+    <span class="step-label">OPTION</span>
+    <h2>法人名検索を有効にする</h2>
+    <p>郵便番号検索だけなら追加設定は不要です。法人名・法人番号の検索も使う場合は、国税庁の法人番号システムWeb-APIのアプリケーションIDを取得し、<code>.env</code> に設定します。</p>
+    <div class="code-wrap"><button class="copy" type="button">コピー</button><pre><code>NTA_APPLICATION_ID=取得したアプリケーションID</code></pre></div>
+    <p>設定後にサーバーを再起動します。IDはサーバー側だけで使われ、ブラウザへは送られません。</p>
+  </section>
+
+  <section id="production">
+    <span class="step-label">BEFORE RELEASE</span>
+    <h2>公開前に確認する</h2>
+    <p>本番環境へ出す前に、次のコマンドをすべて通します。</p>
+    <div class="code-wrap"><button class="copy" type="button">コピー</button><pre><code>npm test
+npm run typecheck
+npm run build
+npm start</code></pre></div>
+    <ul>
+      <li><code>HOST=0.0.0.0</code> と公開先が指定する <code>PORT</code> を設定する</li>
+      <li><code>ALLOWED_ORIGINS</code> を実際のWebサイトだけに絞る</li>
+      <li>郵便番号データを定期的に <code>npm run data:postal</code> で更新する</li>
+      <li>国税庁データを表示するときは必要な出典・免責表記を掲載する</li>
+      <li><code>NTA_APPLICATION_ID</code> や <code>.env</code> を公開リポジトリへ入れない</li>
+    </ul>
+  </section>
+
+  <section id="trouble">
+    <span class="step-label">HELP</span>
+    <h2>困ったとき</h2>
+    <h3>住所が見つからない</h3>
+    <p><code>npm run data:postal</code> が最後まで完了したか確認してください。郵便番号は7桁で入力します。</p>
+    <h3>法人検索だけ503になる</h3>
+    <p><code>NTA_APPLICATION_ID</code> が未設定の状態です。郵便番号検索はそのまま利用できます。</p>
+    <h3>別のサイトから呼ぶと403になる</h3>
+    <p><code>ALLOWED_ORIGINS</code> にそのサイトのオリジンを追加し、サーバーを再起動します。</p>
+
+    <div class="next">
+      <h2>次にできること</h2>
+      <p><a href="../lp/">ライブデモへ戻る</a>、<a href="/documentation">API仕様を見る</a>、または<a href="https://github.com/nishiokya/jp-qac">GitHubでコードとIssuesを見る</a>。</p>
+      <p>ドキュメントだけで解決しない環境構築や組み込みは、必要な場合に限り個別の有料サポートをご案内します。</p>
+    </div>
+  </section>
+</main>
+
+<footer>jp-qac — 基本機能は無料。個別サポートは必要な方だけ。</footer>
+<script>
+  document.querySelectorAll(".copy").forEach(function (button) {
+    button.addEventListener("click", async function () {
+      const text = button.nextElementSibling.textContent;
+      await navigator.clipboard.writeText(text);
+      button.textContent = "コピー済み";
+      setTimeout(function () { button.textContent = "コピー"; }, 1400);
+    });
+  });
+</script>
+</body>
+</html>

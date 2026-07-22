@@ -26,6 +26,8 @@ npm run dev
 
 試験公開の手順は [docs/deploy.md](docs/deploy.md) にまとめています。
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/nishiokya/jp-qac)
+
 ## API
 
 - `GET /health`

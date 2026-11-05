@@ -1,23 +1,55 @@
+import { XMLParser, XMLValidator } from "fast-xml-parser";
+import { z } from "zod";
 import { ApiError } from "../errors.js";
 import type { Corporation, CorporationProvider } from "../domain/types.js";
 
 const BASE_URL = "https://api.houjin-bangou.nta.go.jp/4";
 
-type NtaCorporation = {
-  corporateNumber?: string;
-  name?: string;
-  furigana?: string;
-  postCode?: string;
-  prefectureName?: string;
-  cityName?: string;
-  streetNumber?: string;
-  closeDate?: string;
-  updateDate?: string;
-};
+// Keep identifiers and postal codes as strings, including leading zeroes.
+const corporationSchema = z.object({
+  corporateNumber: z.string().regex(/^\d{13}$/),
+  name: z.string().min(1),
+  furigana: z.string().optional(),
+  postCode: z.string().optional(),
+  prefectureName: z.string().optional(),
+  cityName: z.string().optional(),
+  streetNumber: z.string().optional(),
+  closeDate: z.string().optional(),
+  updateDate: z.string().optional()
+});
+type NtaCorporation = z.infer<typeof corporationSchema>;
+const responseSchema = z.object({
+  corporations: z.object({
+    count: z.string().regex(/^\d+$/),
+    corporation: z.array(corporationSchema).default([])
+  })
+});
+const parser = new XMLParser({
+  parseTagValue: false,
+  isArray: (_name, path) => path === "corporations.corporation"
+});
 
-type NtaResponse = {
-  corporation?: NtaCorporation | NtaCorporation[];
-};
+function invalidResponse(): ApiError {
+  return new ApiError(502, "UPSTREAM_ERROR", "法人情報サービスから正常な応答がありませんでした");
+}
+
+function parseResponse(xml: string): NtaCorporation[] {
+  // NTA responses do not need DTDs or custom entities. Never parse them.
+  if (/<!DOCTYPE|<!ENTITY/i.test(xml) || XMLValidator.validate(xml) !== true) {
+    throw invalidResponse();
+  }
+  const result = responseSchema.safeParse(parser.parse(xml));
+  if (!result.success) throw invalidResponse();
+  const { count, corporation } = result.data.corporations;
+  if ((count === "0") !== (corporation.length === 0)) throw invalidResponse();
+  return corporation;
+}
+
+function toNtaName(name: string): string {
+  // target=1 requires full-width characters, even after API NFKC normalization.
+  return name.normalize("NFKC").replace(/[!-~]/g, (char) =>
+    String.fromCharCode(char.charCodeAt(0) + 0xfee0)).replace(/ /g, "　");
+}
 
 function toCorporation(value: NtaCorporation): Corporation {
   return {
@@ -42,15 +74,15 @@ export class NtaCorporationProvider implements CorporationProvider {
   async search(name: string, limit: number, signal?: AbortSignal): Promise<Corporation[]> {
     const params = new URLSearchParams({
       id: this.applicationId,
-      name,
+      name: toNtaName(name),
       type: "12",
       mode: "2",
-      kind: "01",
-      change: "1",
+      target: "1",
+      change: "0",
       close: "0"
     });
     const data = await this.request(`${BASE_URL}/name?${params}`, signal);
-    return this.extract(data).slice(0, limit);
+    return data.map(toCorporation).slice(0, limit);
   }
 
   async findByNumber(number: string, signal?: AbortSignal): Promise<Corporation | null> {
@@ -61,27 +93,23 @@ export class NtaCorporationProvider implements CorporationProvider {
       history: "0"
     });
     const data = await this.request(`${BASE_URL}/num?${params}`, signal);
-    return this.extract(data)[0] ?? null;
+    return data[0] ? toCorporation(data[0]) : null;
   }
 
-  private extract(data: NtaResponse): Corporation[] {
-    const source = data.corporation;
-    if (!source) return [];
-    return (Array.isArray(source) ? source : [source]).map(toCorporation);
-  }
-
-  private async request(url: string, signal?: AbortSignal): Promise<NtaResponse> {
+  private async request(url: string, signal?: AbortSignal): Promise<NtaCorporation[]> {
     const timeout = AbortSignal.timeout(5_000);
     const combinedSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
     try {
       const response = await this.fetchImpl(url, {
-        headers: { accept: "application/json", "user-agent": "jp-qac/0.1" },
+        headers: { accept: "application/xml", "user-agent": "jp-qac/0.1" },
+        redirect: "error",
         signal: combinedSignal
       });
       if (!response.ok) {
         throw new ApiError(502, "UPSTREAM_ERROR", "法人情報サービスから正常な応答がありませんでした");
       }
-      return await response.json() as NtaResponse;
+      const xml = await response.text();
+      return parseResponse(xml);
     } catch (error) {
       if (error instanceof ApiError) throw error;
       throw new ApiError(503, "UPSTREAM_UNAVAILABLE", "法人情報サービスに接続できませんでした");

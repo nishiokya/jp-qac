@@ -18,3 +18,10 @@
 - Run `npm test`, `npm run typecheck`, and `npm run build` for code or configuration changes.
 - For user-facing pages, also verify `/demo/lp/`, `/demo/tutorial/`, `/documentation`, and the SDK in a browser at the configured local port (3010 by default).
 - Before publishing, confirm that secrets and `.env` are not tracked and that public links point to the intended repository and host.
+
+## Corporation data
+
+- Treat NTA application IDs as secrets: server environment only; never commit, log, include in fixtures/PRs, or expose to clients.
+- Verify upstream requests against the official NTA specifications. `type=12` is XML, not JSON; test with synthetic XML fixtures.
+- Preserve corporation numbers and postal codes as strings. Name suggestions must use current records across all corporation kinds.
+- Keep national data imports separate from the web deploy until storage, refresh, and rollback have been measured; see `docs/corporation-search.md`.
